@@ -1,13 +1,14 @@
-#!/bin/sh
+#!/usr/bin/env bash
+set -e
 
-echo "Esperando a la base de datos..."
-until nc -z db 5432; do
+# Esperar a que la DB esté lista
+until nc -z ${POSTGRES_HOST:-db} ${POSTGRES_PORT:-5432}; do
+  echo "Esperando a la base de datos..."
   sleep 1
 done
 
-echo "Base de datos lista. Ejecutando migraciones..."
-python manage.py makemigrations
-python manage.py migrate
+# No ejecutamos migraciones porque las tablas existen por SQL init (managed=False)
+# python manage.py migrate --fake-initial
 
-echo "Iniciando servidor Django..."
-exec python manage.py runserver 0.0.0.0:8000
+# Ejecutar servidor
+python manage.py runserver 0.0.0.0:8000

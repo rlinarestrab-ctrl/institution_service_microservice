@@ -1,10 +1,9 @@
-"""
-Django settings for institution_service project.
-"""
+
 
 from pathlib import Path
 import os
 import dj_database_url  # ✅ si lo agregas en requirements.txt (opcional pero útil)
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 

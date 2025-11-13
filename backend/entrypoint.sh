@@ -1,30 +1,32 @@
-#!/usr/bin/env bash
-set -e
-
 echo "🐘 Esperando a la base de datos..."
-
 python << 'END'
 import time, os
 import psycopg2
+from urllib.parse import urlparse
 
-# Leer variables de entorno con valores por defecto (para entorno local)
-db_name = os.getenv("POSTGRES_DB") or os.getenv("DB_NAME") or "postgres"
-db_user = os.getenv("POSTGRES_USER") or os.getenv("DB_USER") or "postgres"
-db_password = os.getenv("POSTGRES_PASSWORD") or os.getenv("DB_PASSWORD") or "postgres"
-db_host = os.getenv("POSTGRES_HOST") or os.getenv("DB_HOST") or "db"
-db_port = os.getenv("POSTGRES_PORT") or os.getenv("DB_PORT") or "5432"
+db_url = os.getenv("DATABASE_URL")
 
-print(f"🔍 Intentando conectar a PostgreSQL en {db_host}:{db_port} db={db_name} user={db_user}")
+if db_url:
+    # Parsear DATABASE_URL
+    parsed = urlparse(db_url)
+    dsn = db_url
+    print(f"🔍 Conectando usando DATABASE_URL...")
+else:
+    # Variables normales (local)
+    db_name = os.getenv("POSTGRES_DB", "postgres")
+    db_user = os.getenv("POSTGRES_USER", "postgres")
+    db_password = os.getenv("POSTGRES_PASSWORD", "postgres")
+    db_host = os.getenv("POSTGRES_HOST", "db")
+    db_port = os.getenv("POSTGRES_PORT", "5432")
+
+    dsn = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+    print(f"🔍 Conectando usando POSTGRES_* variables...")
+
+print(f"🔎 DSN usado: {dsn}")
 
 while True:
     try:
-        conn = psycopg2.connect(
-            dbname=db_name,
-            user=db_user,
-            password=db_password,
-            host=db_host,
-            port=db_port,
-        )
+        conn = psycopg2.connect(dsn)
         conn.close()
         print("✅ Conexión a la base de datos establecida.")
         break
@@ -33,5 +35,3 @@ while True:
         time.sleep(2)
 END
 
-echo "🚀 Iniciando servidor Django..."
-python manage.py runserver 0.0.0.0:8000

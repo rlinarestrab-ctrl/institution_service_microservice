@@ -19,13 +19,13 @@ ALLOWED_HOSTS = ["*"]  # En Render puede cambiar dinámicamente, así no bloquea
 # 🧩 Aplicaciones instaladas
 # ------------------------------------------------------------------------------------
 INSTALLED_APPS = [
+    "corsheaders",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "corsheaders",
     "rest_framework",
     "institutions",
 ]
@@ -123,7 +123,8 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # ------------------------------------------------------------------------------------
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # modo dev
-    "https://vocational-frontend.vercel.app",  # producción
+    "https://vocational-frontend.vercel.app",
+    "https://turutaeducativa.vercel.app",  # producción
 ]
 
 CORS_ALLOW_CREDENTIALS = True

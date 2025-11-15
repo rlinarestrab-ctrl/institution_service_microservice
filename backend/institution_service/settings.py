@@ -74,9 +74,16 @@ WSGI_APPLICATION = "institution_service.wsgi.application"
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 if DATABASE_URL:
-    # Usar la cadena tal cual, sin tocar el search_path
-    DATABASES["default"]["OPTIONS"] = {}
+    # Producción: Render + Supabase (usa el esquema public por defecto)
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=True,  # normalmente True en Supabase
+        )
+    }
 else:
+    # Desarrollo local: Docker / Postgres local
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -87,10 +94,6 @@ else:
             "PORT": os.getenv("POSTGRES_PORT", "5432"),
         }
     }
-
-# Si usas esquemas distintos en Supabase (opcional)
-# DATABASES["default"]["OPTIONS"] = {"options": "-c search_path=institution"}
-
 # ------------------------------------------------------------------------------------
 # 🔑 Validadores de contraseña
 # ------------------------------------------------------------------------------------
